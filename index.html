@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TaskFlow">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/xrosollek/TaskFlow/main/TaskFlow.jpg">
+    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/xrosollek/TaskFlow/main/TaskFlow.jpg">
     <title>TaskFlow - Zarządzanie Zadaniami</title>
     <style>
         * {
@@ -365,7 +368,8 @@
         .calendar-day.has-tasks::after {
             content: '';
             position: absolute;
-            bottom: 4px;
+            top: 4px;
+            right: 4px;
             width: 6px;
             height: 6px;
             border-radius: 50%;
@@ -643,15 +647,13 @@
 </head>
 <body>
     <div class="app-container">
-       <header class="header">
-    <h1>
-        <img src="https://raw.githubusercontent.com/xrosollek/TaskFlow/main/TaskFlow.jpg" alt="Logo" style="width: 32px; height: 32px; border-radius: 0;">
-        TaskFlow
-    </h1>
-    <div class="header-actions">
-        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-    </div>
-</header>
+        <header class="header">
+            <h1>TaskFlow</h1>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </div>
+        </header>
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('tasks')">📋 Zadania</button>
             <button class="tab" onclick="switchTab('calendar')">📅 Kalendarz</button>
@@ -737,16 +739,6 @@
                     <input type="date" class="form-input" id="taskDate" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Kategoria</label>
-                    <select class="form-select" id="taskCategory">
-                        <option value="praca">💼 Praca</option>
-                        <option value="osobiste">👤 Osobiste</option>
-                        <option value="zakupy">🛒 Zakupy</option>
-                        <option value="zdrowie">🏥 Zdrowie</option>
-                        <option value="nauka">📚 Nauka</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label class="form-label">Priorytet</label>
                     <select class="form-select" id="taskPriority">
                         <option value="low">Niski</option>
@@ -788,16 +780,6 @@
                 <div class="form-group">
                     <label class="form-label">Data</label>
                     <input type="date" class="form-input" id="editTaskDate" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Kategoria</label>
-                    <select class="form-select" id="editTaskCategory">
-                        <option value="praca">💼 Praca</option>
-                        <option value="osobiste">👤 Osobiste</option>
-                        <option value="zakupy">🛒 Zakupy</option>
-                        <option value="zdrowie">🏥 Zdrowie</option>
-                        <option value="nauka">📚 Nauka</option>
-                    </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Priorytet</label>
@@ -887,7 +869,6 @@
                 id: Date.now(),
                 title: document.getElementById('taskTitle').value.trim(),
                 date: document.getElementById('taskDate').value,
-                category: document.getElementById('taskCategory').value,
                 priority: document.getElementById('taskPriority').value,
                 note: document.getElementById('taskNote').value.trim(),
                 completed: false
@@ -922,7 +903,6 @@
                     </div>
                     
                     <div class="task-meta" style="margin-bottom: 16px;">
-                        <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
                         <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
                         <span class="badge badge-date">📅 ${formatDate(task.date)}</span>
                     </div>
@@ -953,7 +933,6 @@
             document.getElementById('editTaskId').value = task.id;
             document.getElementById('editTaskTitle').value = task.title;
             document.getElementById('editTaskDate').value = task.date;
-            document.getElementById('editTaskCategory').value = task.category;
             document.getElementById('editTaskPriority').value = task.priority;
             document.getElementById('editTaskNote').value = task.note || '';
 
@@ -968,7 +947,6 @@
             if (task) {
                 task.title = document.getElementById('editTaskTitle').value.trim();
                 task.date = document.getElementById('editTaskDate').value;
-                task.category = document.getElementById('editTaskCategory').value;
                 task.priority = document.getElementById('editTaskPriority').value;
                 task.note = document.getElementById('editTaskNote').value.trim();
                 
@@ -1018,7 +996,6 @@
                             <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                             ${task.note ? `<div class="task-note-preview">💬 ${task.note}</div>` : ''}
                             <div class="task-meta">
-                                <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
                                 <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
                                 <span class="badge badge-date">📅 ${formatDate(task.date)}</span>
                             </div>
@@ -1047,14 +1024,7 @@
         }
 
         function getCategoryIcon(category) {
-            const icons = {
-                praca: '💼',
-                osobiste: '👤',
-                zakupy: '🛒',
-                zdrowie: '🏥',
-                nauka: '📚'
-            };
-            return icons[category] || '📋';
+            return '📋';
         }
 
         function getPriorityText(priority) {
@@ -1168,7 +1138,6 @@
                                 <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                                 ${task.note ? `<div class="task-note-preview">💬 ${task.note}</div>` : ''}
                                 <div class="task-meta">
-                                    <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
                                     <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
                                 </div>
                             </div>
@@ -1204,7 +1173,3 @@
     </script>
 </body>
 </html>
-
-
-
-
