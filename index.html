@@ -166,6 +166,37 @@
             margin-top: 4px;
         }
 
+        .progress-bar-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--accent));
+            border-radius: 12px;
+            transition: width 0.5s ease;
+        }
+
         .task-card {
             background: var(--bg-card);
             border-radius: 16px;
@@ -174,6 +205,7 @@
             box-shadow: 0 2px 8px var(--shadow);
             transition: transform 0.2s, box-shadow 0.2s;
             animation: slideIn 0.3s ease-out;
+            cursor: pointer;
         }
 
         @keyframes slideIn {
@@ -240,6 +272,17 @@
         .task-title.completed {
             text-decoration: line-through;
             opacity: 0.6;
+        }
+
+        .task-note-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-style: italic;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .task-meta {
@@ -332,6 +375,13 @@
         .calendar-day-number {
             font-size: 14px;
             font-weight: 600;
+        }
+
+        .calendar-progress {
+            font-size: 9px;
+            color: var(--success);
+            font-weight: 700;
+            margin-top: 2px;
         }
 
         .fab {
@@ -449,9 +499,29 @@
             color: var(--text-primary);
             font-size: 16px;
             transition: border-color 0.3s;
+            font-family: inherit;
         }
 
         .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-textarea:focus {
             outline: none;
             border-color: var(--accent);
         }
@@ -487,6 +557,16 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            margin-top: 12px;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -509,18 +589,34 @@
             font-size: 14px;
         }
 
-        .delete-btn {
-            padding: 6px 12px;
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
             border: none;
             border-radius: 8px;
-            background: var(--danger);
-            color: white;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 12px;
             transition: opacity 0.3s;
         }
 
-        .delete-btn:hover {
+        .btn-edit {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn:hover {
             opacity: 0.8;
         }
 
@@ -574,15 +670,26 @@
                     <div class="stat-label">Do zrobienia</div>
                 </div>
             </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-label">
+                    <span>Postęp dzisiejszy</span>
+                    <span id="todayProgress">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="todayProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
             <div id="tasksList"></div>
         </div>
 
         <div class="content" id="calendarTab" style="display: none;">
             <div style="background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <button onclick="changeMonth(-1)" style="border: none; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; cursor: pointer;">◀</button>
+                    <button onclick="changeMonth(-1)" style="border: none; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--text-primary);">◀</button>
                     <h2 id="currentMonth" style="font-size: 18px; font-weight: 600;"></h2>
-                    <button onclick="changeMonth(1)" style="border: none; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; cursor: pointer;">▶</button>
+                    <button onclick="changeMonth(1)" style="border: none; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--text-primary);">▶</button>
                 </div>
                 <div class="calendar-grid">
                     <div class="calendar-header">Pon</div>
@@ -595,17 +702,28 @@
                 </div>
                 <div class="calendar-grid" id="calendarDays"></div>
             </div>
+
+            <div class="progress-bar-container" id="selectedDayProgress" style="display: none;">
+                <div class="progress-label">
+                    <span>Postęp wybranego dnia</span>
+                    <span id="selectedDayProgressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="selectedDayProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
             <div id="selectedDayTasks"></div>
         </div>
 
-        <button class="fab" onclick="openModal()">+</button>
+        <button class="fab" onclick="openAddModal()">+</button>
     </div>
 
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Nowe zadanie</h2>
-                <button class="close-btn" onclick="closeModal()">×</button>
+                <button class="close-btn" onclick="closeModal('taskModal')">×</button>
             </div>
             <form id="taskForm">
                 <div class="form-group">
@@ -634,21 +752,96 @@
                         <option value="high">Wysoki</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Notatka (opcjonalnie)</label>
+                    <textarea class="form-textarea" id="taskNote" placeholder="Dodaj szczegóły..."></textarea>
+                </div>
                 <button type="submit" class="btn btn-primary">Dodaj zadanie</button>
             </form>
         </div>
     </div>
 
+    <div class="modal" id="taskDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Szczegóły zadania</h2>
+                <button class="close-btn" onclick="closeModal('taskDetailModal')">×</button>
+            </div>
+            <div id="taskDetailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="taskEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edytuj zadanie</h2>
+                <button class="close-btn" onclick="closeModal('taskEditModal')">×</button>
+            </div>
+            <form id="taskEditForm">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label class="form-label">Nazwa zadania</label>
+                    <input type="text" class="form-input" id="editTaskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="editTaskDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kategoria</label>
+                    <select class="form-select" id="editTaskCategory">
+                        <option value="praca">💼 Praca</option>
+                        <option value="osobiste">👤 Osobiste</option>
+                        <option value="zakupy">🛒 Zakupy</option>
+                        <option value="zdrowie">🏥 Zdrowie</option>
+                        <option value="nauka">📚 Nauka</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priorytet</label>
+                    <select class="form-select" id="editTaskPriority">
+                        <option value="low">Niski</option>
+                        <option value="medium">Średni</option>
+                        <option value="high">Wysoki</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notatka</label>
+                    <textarea class="form-textarea" id="editTaskNote" placeholder="Dodaj szczegóły..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                <button type="button" class="btn btn-danger" onclick="deleteTaskFromEdit()">Usuń zadanie</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let tasks = [];
         let currentDate = new Date();
         let selectedDate = null;
+        let currentTab = 'tasks';
+
+        function loadTasks() {
+            const saved = localStorage.getItem('taskflow_tasks');
+            if (saved) {
+                try {
+                    tasks = JSON.parse(saved);
+                } catch (e) {
+                    tasks = [];
+                }
+            }
+        }
 
         function saveTasks() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('taskflow_tasks', JSON.stringify(tasks));
             renderTasks();
             updateStats();
-            renderCalendar();
+            if (currentTab === 'calendar') {
+                renderCalendar();
+                if (selectedDate) {
+                    renderSelectedDayTasks();
+                }
+            }
         }
 
         function toggleTheme() {
@@ -661,44 +854,52 @@
         }
 
         function switchTab(tab) {
+            currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
             document.getElementById('tasksTab').style.display = tab === 'tasks' ? 'block' : 'none';
             document.getElementById('calendarTab').style.display = tab === 'calendar' ? 'block' : 'none';
-            event.target.classList.add('active');
-            if (tab === 'calendar') renderCalendar();
+            
+            if (tab === 'calendar') {
+                renderCalendar();
+            }
         }
 
-        function openModal() {
+        function openAddModal() {
             document.getElementById('taskModal').classList.add('active');
-            if (selectedDate) {
+            if (selectedDate && currentTab === 'calendar') {
                 document.getElementById('taskDate').value = selectedDate;
             } else {
                 document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
             }
         }
 
-        function closeModal() {
-            document.getElementById('taskModal').classList.remove('active');
-            document.getElementById('taskTitle').value = '';
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
 
         function addTask(e) {
             e.preventDefault();
             const task = {
                 id: Date.now(),
-                title: document.getElementById('taskTitle').value,
+                title: document.getElementById('taskTitle').value.trim(),
                 date: document.getElementById('taskDate').value,
                 category: document.getElementById('taskCategory').value,
                 priority: document.getElementById('taskPriority').value,
+                note: document.getElementById('taskNote').value.trim(),
                 completed: false
             };
             tasks.push(task);
             saveTasks();
-            closeModal();
+            closeModal('taskModal');
             document.getElementById('taskForm').reset();
         }
 
-        function toggleTask(id) {
+        function toggleTask(id, event) {
+            if (event) {
+                event.stopPropagation();
+            }
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
@@ -706,16 +907,95 @@
             }
         }
 
+        function openTaskDetail(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            const content = document.getElementById('taskDetailContent');
+            content.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                        <h3 class="task-title ${task.completed ? 'completed' : ''}" style="font-size: 20px;">${task.title}</h3>
+                    </div>
+                    
+                    <div class="task-meta" style="margin-bottom: 16px;">
+                        <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
+                        <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
+                        <span class="badge badge-date">📅 ${formatDate(task.date)}</span>
+                    </div>
+
+                    ${task.note ? `
+                        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-top: 16px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">📝 Notatka:</div>
+                            <div style="color: var(--text-secondary); white-space: pre-wrap; line-height: 1.6;">${task.note}</div>
+                        </div>
+                    ` : '<div style="color: var(--text-secondary); font-style: italic; margin-top: 16px;">Brak notatki</div>'}
+
+                    <div class="task-actions">
+                        <button class="action-btn btn-edit" onclick="openEditModal(${task.id})">✏️ Edytuj</button>
+                        <button class="action-btn btn-delete" onclick="deleteTask(${task.id})">🗑️ Usuń</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('taskDetailModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            closeModal('taskDetailModal');
+
+            document.getElementById('editTaskId').value = task.id;
+            document.getElementById('editTaskTitle').value = task.title;
+            document.getElementById('editTaskDate').value = task.date;
+            document.getElementById('editTaskCategory').value = task.category;
+            document.getElementById('editTaskPriority').value = task.priority;
+            document.getElementById('editTaskNote').value = task.note || '';
+
+            document.getElementById('taskEditModal').classList.add('active');
+        }
+
+        function updateTask(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editTaskId').value);
+            const task = tasks.find(t => t.id === id);
+            
+            if (task) {
+                task.title = document.getElementById('editTaskTitle').value.trim();
+                task.date = document.getElementById('editTaskDate').value;
+                task.category = document.getElementById('editTaskCategory').value;
+                task.priority = document.getElementById('editTaskPriority').value;
+                task.note = document.getElementById('editTaskNote').value.trim();
+                
+                saveTasks();
+                closeModal('taskEditModal');
+            }
+        }
+
         function deleteTask(id) {
             if (confirm('Czy na pewno chcesz usunąć to zadanie?')) {
                 tasks = tasks.filter(t => t.id !== id);
                 saveTasks();
+                closeModal('taskDetailModal');
+                closeModal('taskEditModal');
             }
+        }
+
+        function deleteTaskFromEdit() {
+            const id = parseInt(document.getElementById('editTaskId').value);
+            deleteTask(id);
         }
 
         function renderTasks() {
             const tasksList = document.getElementById('tasksList');
-            const sortedTasks = [...tasks].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const sortedTasks = [...tasks].sort((a, b) => {
+                const dateCompare = new Date(a.date) - new Date(b.date);
+                if (dateCompare !== 0) return dateCompare;
+                return b.id - a.id;
+            });
             
             if (sortedTasks.length === 0) {
                 tasksList.innerHTML = `
@@ -729,11 +1009,12 @@
             }
 
             tasksList.innerHTML = sortedTasks.map(task => `
-                <div class="task-card">
+                <div class="task-card" onclick="openTaskDetail(${task.id})">
                     <div class="task-header">
-                        <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                        <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id}, event)"></div>
                         <div class="task-content">
                             <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
+                            ${task.note ? `<div class="task-note-preview">💬 ${task.note}</div>` : ''}
                             <div class="task-meta">
                                 <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
                                 <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
@@ -741,15 +1022,26 @@
                             </div>
                         </div>
                     </div>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Usuń</button>
                 </div>
             `).join('');
         }
 
         function updateStats() {
-            document.getElementById('totalTasks').textContent = tasks.length;
-            document.getElementById('completedTasks').textContent = tasks.filter(t => t.completed).length;
-            document.getElementById('pendingTasks').textContent = tasks.filter(t => !t.completed).length;
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = tasks.filter(t => t.date === today);
+            const todayCompleted = todayTasks.filter(t => t.completed).length;
+            const todayProgress = todayTasks.length > 0 ? Math.round((todayCompleted / todayTasks.length) * 100) : 0;
+
+            document.getElementById('todayProgress').textContent = `${todayProgress}%`;
+            document.getElementById('todayProgressBar').style.width = `${todayProgress}%`;
         }
 
         function getCategoryIcon(category) {
@@ -773,15 +1065,19 @@
         }
 
         function formatDate(dateStr) {
-            const date = new Date(dateStr);
+            const date = new Date(dateStr + 'T00:00:00');
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
 
-            if (date.toDateString() === today.toDateString()) return 'Dziś';
-            if (date.toDateString() === tomorrow.toDateString()) return 'Jutro';
+            const dateOnly = new Date(date);
+            dateOnly.setHours(0, 0, 0, 0);
 
-            return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
+            if (dateOnly.getTime() === today.getTime()) return 'Dziś';
+            if (dateOnly.getTime() === tomorrow.getTime()) return 'Jutro';
+
+            return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
         function renderCalendar() {
@@ -803,24 +1099,31 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const hasTasks = tasks.some(t => t.date === dateStr);
+                const dayTasks = tasks.filter(t => t.date === dateStr);
+                const hasTasks = dayTasks.length > 0;
                 const isSelected = selectedDate === dateStr;
+                
+                const completedCount = dayTasks.filter(t => t.completed).length;
+                const progressPercent = dayTasks.length > 0 ? Math.round((completedCount / dayTasks.length) * 100) : 0;
                 
                 daysHTML += `
                     <div class="calendar-day ${hasTasks ? 'has-tasks' : ''} ${isSelected ? 'selected' : ''}" 
                          onclick="selectDate('${dateStr}')">
                         <span class="calendar-day-number">${day}</span>
+                        ${hasTasks ? `<span class="calendar-progress">${progressPercent}%</span>` : ''}
                     </div>
                 `;
             }
 
             document.getElementById('calendarDays').innerHTML = daysHTML;
-            if (selectedDate) renderSelectedDayTasks();
         }
 
         function changeMonth(delta) {
             currentDate.setMonth(currentDate.getMonth() + delta);
             renderCalendar();
+            if (selectedDate) {
+                renderSelectedDayTasks();
+            }
         }
 
         function selectDate(dateStr) {
@@ -832,8 +1135,10 @@
         function renderSelectedDayTasks() {
             const dayTasks = tasks.filter(t => t.date === selectedDate);
             const container = document.getElementById('selectedDayTasks');
+            const progressContainer = document.getElementById('selectedDayProgress');
             
             if (dayTasks.length === 0) {
+                progressContainer.style.display = 'none';
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📅</div>
@@ -844,21 +1149,28 @@
                 return;
             }
 
+            const completedCount = dayTasks.filter(t => t.completed).length;
+            const progressPercent = Math.round((completedCount / dayTasks.length) * 100);
+
+            progressContainer.style.display = 'block';
+            document.getElementById('selectedDayProgressText').textContent = `${progressPercent}%`;
+            document.getElementById('selectedDayProgressBar').style.width = `${progressPercent}%`;
+
             container.innerHTML = `
-                <h3 style="margin-bottom: 16px; font-size: 18px;">Zadania na ${formatDate(selectedDate)}</h3>
+                <h3 style="margin-bottom: 16px; font-size: 18px; color: var(--text-primary);">Zadania na ${formatDate(selectedDate)}</h3>
                 ${dayTasks.map(task => `
-                    <div class="task-card">
+                    <div class="task-card" onclick="openTaskDetail(${task.id})">
                         <div class="task-header">
-                            <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                            <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id}, event)"></div>
                             <div class="task-content">
                                 <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
+                                ${task.note ? `<div class="task-note-preview">💬 ${task.note}</div>` : ''}
                                 <div class="task-meta">
                                     <span class="badge badge-category">${getCategoryIcon(task.category)} ${task.category}</span>
                                     <span class="badge badge-priority-${task.priority}">${getPriorityText(task.priority)}</span>
                                 </div>
                             </div>
                         </div>
-                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Usuń</button>
                     </div>
                 `).join('')}
             `;
@@ -868,17 +1180,24 @@
         document.body.setAttribute('data-theme', savedTheme);
         document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
+        loadTasks();
         renderTasks();
         updateStats();
         renderCalendar();
 
-        document.getElementById('taskForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            addTask(e);
-        });
+        document.getElementById('taskForm').addEventListener('submit', addTask);
+        document.getElementById('taskEditForm').addEventListener('submit', updateTask);
 
         document.getElementById('taskModal').addEventListener('click', (e) => {
-            if (e.target.id === 'taskModal') closeModal();
+            if (e.target.id === 'taskModal') closeModal('taskModal');
+        });
+
+        document.getElementById('taskDetailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'taskDetailModal') closeModal('taskDetailModal');
+        });
+
+        document.getElementById('taskEditModal').addEventListener('click', (e) => {
+            if (e.target.id === 'taskEditModal') closeModal('taskEditModal');
         });
     </script>
 </body>
